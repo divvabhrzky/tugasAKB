@@ -1,0 +1,71 @@
+/* --- STYLING SUB-MENU (DROPDOWN) --- */
+        .dropdown {
+            position: relative; /* Menjadi patokan posisi kotak sub-menu */
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+        }
+
+        /* Kotak Sub-Menu (Awalnya Tersembunyi) */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--card-background);
+            min-width: 200px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            list-style: none;
+            padding: 10px 0;
+            margin-top: 10px;
+            opacity: 0;
+            pointer-events: none; /* Mencegah klik saat tidak terlihat */
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        /* Batasan link di dalam sub-menu */
+        .dropdown-menu li a {
+            display: block;
+            padding: 10px 20px;
+            color: var(--text-color);
+            font-weight: normal;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        /* Efek saat opsi sub-menu didekati kursor */
+        .dropdown-menu li a:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--primary-color);
+        }
+
+        /* TRIGER: Munculkan sub-menu saat menu utama di-hover */
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Penyesuaian responsif untuk tampilan HP */
+        @media (max-width: 768px) {
+            .dropdown-menu {
+                position: static; /* Membuat menu turun ke bawah di layar HP */
+                box-shadow: none;
+                opacity: 1;
+                pointer-events: auto;
+                transform: none;
+                padding-left: 20px;
+                background-color: transparent;
+                display: none; /* Default tersembunyi di HP */
+            }
+
+            /* Di HP, sub-menu akan otomatis terlihat di bawah menu utamanya */
+            .dropdown:hover .dropdown-menu {
+                display: block;
+            }
+        }s

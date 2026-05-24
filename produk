@@ -1,0 +1,28 @@
+{
+  "products": {
+    "produk_01": {
+      "nama": "Mozza-Bite Crispy",
+      "harga": 15000,
+      "gambar": "https://link-foto-anda.com/mozza.jpg",
+      "deskripsi": "Roti goreng dengan isian keju mozzarella lumer yang berlimpah.",
+      "kategori": "makanan",
+      "status": "terlaris"
+    },
+    "produk_02": {
+      "nama": "Cisquit Cheese Stick",
+      "harga": 18000,
+      "gambar": "https://link-foto-anda.com/cisquit.jpg",
+      "deskripsi": "Stik keju renyah gurih premium cocok untuk cemilan.",
+      "kategori": "makanan",
+      "status": "terlaris-po"
+    },
+    "produk_03": {
+      "nama": "Kaos Katun Premium",
+      "harga": 85000,
+      "gambar": "https://link-foto-anda.com/kaos.jpg",
+      "deskripsi": "Bahan katun combed 30s adem dan sangat nyaman.",
+      "kategori": "pakaian",
+      "status": "ready"
+    }
+  }
+}

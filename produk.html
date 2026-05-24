@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Produk - Bakaran Gen Z</title>
+    <style>
+        /* --- VARIABLE STYLING UTAMA --- */
+        :root {
+            --primary-red: #b31217;
+            --secondary-yellow: #fBBF24;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text-main); line-height: 1.6; }
+
+        /* --- NAVBAR & DROPDOWN --- */
+        header { background-color: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 999; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 15px 20px; }
+        .logo-text { font-size: 1.6rem; font-weight: 800; color: var(--primary-red); text-decoration: none; letter-spacing: -1px; }
+        
+        .nav-links { display: flex; list-style: none; gap: 25px; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.95rem; transition: color 0.2s; }
+        .nav-links a:hover, .dropdown:hover > a { color: var(--primary-red); }
+
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 0; background-color: var(--card-bg); min-width: 200px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 8px; list-style: none; padding: 10px 0;
+            opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.2s ease; z-index: 1000;
+        }
+        .dropdown-menu li a { padding: 10px 20px; font-weight: 500; font-size: 0.9rem; display: block; }
+        .dropdown-menu li a:hover { background-color: #fff1f2; color: var(--primary-red); }
+        .dropdown:hover .dropdown-menu { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+        /* --- HEADER HALAMAN --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .page-header h1 { font-size: 2.4rem; font-weight: 800; color: var(--text-main); letter-spacing: -1px; }
+        .page-header p { color: var(--text-muted); font-size: 1.1rem; margin-top: 5px; }
+
+        /* --- UTILITY BAR (CARI & FILTER) --- */
+        .utility-bar { display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px; background: var(--card-bg); padding: 20px; border-radius: var(--radius); border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.01); }
+        
+        /* Input Pencarian */
+        .search-box { position: relative; width: 100%; }
+        .search-box input { width: 100%; padding: 12px 20px; padding-left: 45px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; outline: none; transition: border 0.2s; }
+        .search-box input:focus { border-color: var(--primary-red); box-shadow: 0 0 0 3px #fff1f2; }
+        .search-box::before { content: "🔍"; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; opacity: 0.5; }
+
+        /* Tombol Filter Kategori */
+        .filter-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .filter-btn:hover { background-color: #e2e8f0; color: var(--text-main); }
+        .filter-btn.active { background-color: var(--primary-red); color: white; border-color: var(--primary-red); box-shadow: 0 4px 12px rgba(179, 18, 23, 0.25); }
+
+        /* --- GRID UTAMA PRODUK --- */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        
+        .product-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(179, 18, 23, 0.05); }
+        
+        .product-image-container { width: 100%; height: 220px; overflow: hidden; background: #e2e8f0; position: relative; }
+        .product-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Badge Status (Terlaris / Promo / PO) */
+        .status-badge { position: absolute; top: 15px; right: 15px; background-color: var(--primary-red); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-badge.po { background-color: #7c3aed; }
+
+        .product-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-category { font-size: 0.8rem; text-transform: uppercase; font-weight: bold; color: var(--text-muted); margin-bottom: 8px; }
+        .product-title { font-size: 1.25rem; margin-bottom: 8px; font-weight: 700; color: var(--text-main); text-decoration: none; line-height: 1.3; }
+        .product-title:hover { color: var(--primary-red); }
+        
+        /* Teks Deskripsi Otomatis Pindah Baris */
+        .product-description { 
+            font-size: 0.9rem; 
+            color: var(--text-muted); 
+            margin-bottom: 15px; 
+            display: -webkit-box;
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            white-space: pre-line; 
+        }
+
+        .product-price { font-size: 1.4rem; color: var(--primary-red); font-weight: 800; margin-top: auto; margin-bottom: 20px; }
+        .btn-detail { display: block; text-align: center; text-decoration: none; background-color: #1e293b; color: white; padding: 12px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+        .btn-detail:hover { background-color: var(--primary-red); }
+
+        /* Sinyal Loading / Status Eror */
+        .status-message { grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 60px 0; font-size: 1.1rem; font-weight: 500; }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 0.95rem; margin-top: 80px; border-top: 1px solid #e2e8f0; background-color: var(--card-bg); }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.9rem; }
+            .utility-bar { padding: 15px; }
+            .filter-tabs { gap: 8px; }
+            .filter-btn { padding: 8px 14px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo-text">Bakaran<span style="color: var(--secondary-yellow);">GenZ</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li class="dropdown">
+                    <a href="produk.html" style="color: var(--primary-red);">Katalog Produk ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" onclick="aplikasikanFilter('all')">Semua Menu</a></li>
+                        <li><a href="#" onclick="aplikasikanFilter('makanan')">🍔 Makanan</a></li>
+                        <li><a href="#" onclick="aplikasikanFilter('pakaian')">👕 Pakaian</a></li>
+                        <li><a href="#" onclick="aplikasikanFilter('elektronik')">⚡ Elektronik</a></li>
+                    </ul>
+                </li>
+                <li><a href="kontak.html">Kontak kami</a></li>
+                <li><a href="keranjang.html">🛒 Keranjang</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <section class="page-header">
+            <h1>Katalog Produk Kekinian</h1>
+            <p>Pilih produk favoritmu, disinkronkan secara live dari database cloud.</p>
+        </section>
+
+        <div class="utility-bar">
+            <div class="search-box">
+                <input type="text" id="inputCari" placeholder="Cari nama produk atau deskripsi di sini..." oninput="prosesFilterDanCari()">
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-btn active" id="btn-all" onclick="aplikasikanFilter('all')">✨ Semua Menu</button>
+                <button class="filter-btn" id="btn-dua" onclick="aplikasikanFilter('makanan')">💸Harga Rp. 2000</button>
+                <button class="filter-btn" id="btn-empat" onclick="aplikasikanFilter('pakaian')">💸Harga Rp. 4000</button>
+                <button class="filter-btn" id="btn-minuman" onclick="aplikasikanFilter('elektronik')">🧋Minuman</button>
+            </div>
+        </div>
+
+        <div class="products-grid" id="containerKatalog">
+            <div class="status-message" id="pesanSinyal">Sedang memuat data lezat dari database cloud Google Sheets...</div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Bakaran Gen Z. All rights reserved.</p>
+        <p style="font-size: 0.8rem; margin-top: 5px;">📍 Warung Pak'le Blok F2 No.12 | 📞 NIA: +62 896-4759-7217</p>
+    </footer>
+
+    <script>
+        const URL_API_CLOUD = "https://script.google.com/macros/s/AKfycbzWywnUXe0r4f2Xb3QHv-jwilcAwdWljSQfTxDhOlUYNRb45Y8OnuOxjokWorzbYaIPvw/exec";
+        
+        let masterDataProduk = []; 
+        let kategoriTerpilih = "all"; 
+
+        // 1. Ambil Data dari Google Sheets Cloud
+        async function muatDataProdukDariCloud() {
+            const pesanSinyal = document.getElementById('pesanSinyal');
+            try {
+                const urlAntiCache = `${URL_API_CLOUD}?_=${new Date().getTime()}`;
+                const respon = await fetch(urlAntiCache);
+                masterDataProduk = await respon.json();
+                
+                cekParameterURL();
+                prosesFilterDanCari();
+            } catch (eror) {
+                console.error("Gagal menarik data cloud:", eror);
+                pesanSinyal.innerText = "Gagal terhubung ke database cloud Google Sheets. Periksa koneksi internet Anda.";
+            }
+        }
+
+        // 2. Fungsi Mengubah Status Kategori via Klik
+        function aplikasikanFilter(kategori) {
+            kategoriTerpilih = kategori;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const tombolAktif = document.getElementById(`btn-${kategori}`);
+            if (tombolAktif) tombolAktif.classList.add('active');
+
+            prosesFilterDanCari();
+        }
+
+        // 3. Proses Gabungan Filter Kategori & Input Pencarian Real-Time
+        function prosesFilterDanCari() {
+            const container = document.getElementById('containerKatalog');
+            const kataKunciCari = document.getElementById('inputCari').value.toLowerCase().trim();
+
+            // Tahap A: Filter Berdasarkan Kategori Tab (dua -> makanan, empat -> pakaian, minuman -> elektronik)
+            let hasilFilter = masterDataProduk;
+            if (kategoriTerpilih !== "all") {
+                hasilFilter = masterDataProduk.filter(produk => {
+                    const katProduk = produk.kategori ? produk.kategori.toString().toLowerCase().trim() : '';
+                    return katProduk === kategoriTerpilih;
+                });
+            }
+
+            // Tahap B: Filter Berdasarkan Kata Kunci Pencarian
+            if (kataKunciCari !== "") {
+                hasilFilter = hasilFilter.filter(produk => {
+                    const nama = produk.nama ? produk.nama.toLowerCase() : '';
+                    const deskripsi = produk.deskripsi ? produk.deskripsi.toLowerCase() : '';
+                    return nama.includes(kataKunciCari) || deskripsi.includes(kataKunciCari);
+                });
+            }
+
+            // Tahap C: Cetak Hasil Akhir ke Grid HTML
+            if (hasilFilter.length === 0) {
+                container.innerHTML = `<div class="status-message">Produk tidak ditemukan. Coba gunakan kata kunci lain!</div>`;
+                return;
+            }
+
+            container.innerHTML = hasilFilter.map(produk => {
+                const nominalHarga = parseInt(produk.harga) || 0;
+                
+                // Pemetaan Teks Label Kategori Baru
+                let labelKategori = produk.kategori ? produk.kategori.toString().trim().toLowerCase() : 'umum';
+                if (labelKategori === 'makanan') labelKategori = "🍔 2000";
+                if (labelKategori === 'pakaian') labelKategori = "👕 4000";
+                if (labelKategori === 'elektronik') labelKategori = "Minuman";
+
+                let komponenBadge = '';
+                if (produk.status && produk.status.trim() !== "") {
+                    const statusKecil = produk.status.toLowerCase().trim();
+                    if (statusKecil === 'terlaris') {
+                        komponenBadge = `<span class="status-badge">🔥 TERLARIS</span>`;
+                    } else if (statusKecil === 'terlaris-po' || statusKecil === 'po') {
+                        komponenBadge = `<span class="status-badge po">🕒 PRE-ORDER</span>`;
+                    } else if (statusKecil === 'promo') {
+                        komponenBadge = `<span class="status-badge" style="background-color:#d97706;">🎉 PROMO</span>`;
+                    }
+                }
+
+                return `
+                    <div class="product-card">
+                        <div class="product-image-container">
+                            <img src="${produk.gambar || 'https://placehold.co/600x400?text=Tanpa+Foto'}" alt="${produk.nama}" onerror="this.src='https://placehold.co/600x400?text=Foto+Tidak+Valid'">
+                            ${komponenBadge}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">${labelKategori}</span>
+                            <a href="detail-produk.html?id=${produk.id}" class="product-title">${produk.nama || 'Menu Tanpa Nama'}</a>
+                            <p class="product-description">${produk.deskripsi || 'Nikmati sensasi kelezatan produk berkualitas premium buatan Bakaran Gen Z.'}</p>
+                            <div class="product-price">Rp ${nominalHarga.toLocaleString('id-ID')}</div>
+                            <a href="detail-produk.html?id=${produk.id}" class="btn-detail">Lihat Detail & Pesan</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 4. Membaca Parameter Query dari URL
+        function cekParameterURL() {
+            const parameterURL = new URLSearchParams(window.location.search);
+            const nilaiFilter = parameterURL.get('filter');
+            if (nilaiFilter && ["all", "makanan", "elektronik", "pakaian"].includes(nilaiFilter.toLowerCase())) {
+                kategoriTerpilih = nilaiFilter.toLowerCase();
+                
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                const tombolAktif = document.getElementById(`btn-${kategoriTerpilih}`);
+                if (tombolAktif) tombolAktif.classList.add('active');
+            }
+        }
+
+        muatDataProdukDariCloud();
+    </script>
+</body>
+</html>

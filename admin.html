@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin Cloud - TokoKu</title>
+    <style>
+        /* --- VARIABLE STYLE MODERN --- */
+        :root {
+            --primary: #4f46e5; 
+            --bg: #f8fafc; 
+            --card: #ffffff;
+            --text: #0f172a; 
+            --muted: #64748b; 
+            --danger: #ef4444; 
+            --success: #22c55e;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 30px; }
+        
+        /* Tata Letak Dua Kolom */
+        .dashboard-layout { display: grid; grid-template-columns: 420px 1fr; gap: 30px; max-width: 1600px; margin: 0 auto; }
+        
+        @media (max-width: 992px) {
+            .dashboard-layout { grid-template-columns: 1fr; }
+        }
+
+        .card { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); height: max-content; border: 1px solid #e2e8f0; }
+        
+        h1, h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; color: var(--primary); }
+        .subtitle { color: var(--muted); margin-bottom: 20px; font-size: 0.85rem; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.95rem; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        
+        /* Notifikasi Status */
+        .status-box { display: none; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; margin-bottom: 15px; font-size: 0.9rem; }
+        .status-loading { background: #e0e7ff; color: #4338ca; }
+        .status-success { background: #dcfce7; color: #15803d; }
+
+        .btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-cancel { width: 100%; padding: 10px; background: #e2e8f0; color: var(--text); border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 8px; display: none; }
+
+        /* Sisi Kanan: Tabel Data */
+        .table-container { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); overflow-x: auto; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th, td { padding: 14px 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; color: var(--text); font-weight: 700; }
+        
+        .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: #e2e8f0; }
+        
+        /* Badge Status Berwarna */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; display: inline-block; }
+        .badge-ready { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-po { background: #fef9c3; color: #713f12; border: 1px solid #fef08a; }
+        .badge-terlaris { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-terlaris-po { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+        
+        .btn-table { padding: 6px 12px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; margin-right: 5px; }
+        .btn-edit { background: #3b82f6; color: white; }
+        .btn-del { background: var(--danger); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-layout">
+        
+        <div class="card">
+            <h1 id="formTitle">Tambah Produk Baru</h1>
+            <p class="subtitle" id="formSubtitle">Masukkan data rincian komoditas produk ke Google Sheets.</p>
+            
+            <div id="statusNotification" class="status-box">Memproses data...</div>
+
+            <form id="adminForm">
+                <input type="hidden" id="editProductId" value="">
+                <input type="hidden" id="editProductGambarOld" value="">
+
+                <div class="form-group">
+                    <label>Nama Produk</label>
+                    <input type="text" id="pName" class="form-control" required placeholder="Contoh: Mozza-Bite Crispy">
+                </div>
+                
+                <div class="form-group">
+                    <label>Harga Jual (Rp)</label>
+                    <input type="number" id="pPrice" class="form-control" required placeholder="Contoh: 15000">
+                </div>
+                
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="pCategory" class="form-control">
+                        <option value="makanan">Harga 2000</option>
+                        <option value="pakaian">Harga 4000</option>
+                        <option value="elektronik">Minuman</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Status Ketersediaan</label>
+                    <select id="pStatus" class="form-control">
+                        <option value="ready">✅ Ready Stock</option>
+                        <option value="po">⏳ Pre-Order (PO)</option>
+                        <option value="terlaris">🔥 Produk Terlaris (Ready)</option>
+                        <option value="terlaris-po">🔥 Pre-Order Terlaris (PO)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="labelFoto">Foto Produk</label>
+                    <input type="file" id="pTypeFile" class="form-control" accept="image/*">
+                    <small id="editInfoGambar" style="color:var(--muted); display:none; margin-top:4px;">Kosongkan jika tidak ingin mengganti foto produk</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Deskripsi Produk</label>
+                    <textarea id="pDesc" class="form-control" rows="4" required placeholder="Tulis rincian deskripsi komoditas..."></textarea>
+                </div>
+                
+                <button type="submit" id="btnSubmitForm" class="btn-submit">🚀 Publikasikan Produk</button>
+                <button type="button" id="btnCancelEdit" class="btn-cancel" onclick="resetToCreateMode()">Batal Edit</button>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <h2>Daftar Produk Aktif</h2>
+            <p class="subtitle">Memantau dan mengelola seluruh isi data komoditas secara real-time.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 40px 0;">Mengambil sinkronisasi data Google Sheets...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+
+    <script>
+        // === URL API WEB APP GOOGLE APPS SCRIPT ANDA ===
+        const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbyamzNaR4OOWydmLtTKYerRTUtP79GlTenlRHsvIsQoAk7ubDM00pmSxm05aZO9Y7uflg/exec"; 
+        
+        let localDatabase = [];
+
+        // 1. MEMBACA DATA LIVE DARI GOOGLE SHEETS (Read)
+        function loadProductsData() {
+            fetch(GOOGLE_API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    localDatabase = data;
+                    renderTable(data);
+                })
+                .catch(err => {
+                    console.error("Gagal sinkronisasi data:", err);
+                });
+        }
+
+        // 2. MENCETAK DATA KE TABEL ADMIN
+        function renderTable(products) {
+            const tbody = document.getElementById('productTableBody');
+            if(products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--muted);">Belum ada produk yang terdaftar di Google Sheets.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = products.map((p, index) => {
+                const statusKecil = p.status ? p.status.toLowerCase() : 'ready';
+                return `
+                    <tr>
+                        <td><img src="${p.gambar || 'https://placehold.co/50?text=No+Img'}" class="img-preview" onerror="this.src='https://placehold.co/50?text=Error'"></td>
+                        <td style="font-weight:600; color: var(--text);">${p.nama || 'Tanpa Nama'}</td>
+                        <td style="text-transform: capitalize;">${p.kategori || 'umum'}</td>
+                        <td style="font-weight: 700; color: var(--primary);">Rp ${(parseInt(p.harga) || 0).toLocaleString('id-ID')}</td>
+                        <td><span class="badge badge-${statusKecil}">${p.status || 'Ready'}</span></td>
+                        <td>
+                            <button class="btn-table btn-edit" onclick="triggerEditMode(${index})">🔧 Edit</button>
+                            <button class="btn-table btn-del" onclick="deleteProductCloud('${p.id}', '${p.nama}')">🗑️ Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 3. EVENT SUBMIT FORM (Mencakup fungsi Tambah Baru & Edit Perubahan)
+        document.getElementById('adminForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const statusBox = document.getElementById('statusNotification');
+            const fileInput = document.getElementById('pTypeFile').files[0];
+            const editId = document.getElementById('editProductId').value;
+
+            statusBox.style.display = "block";
+            statusBox.className = "status-box status-loading";
+            statusBox.innerText = "Sedang mengirim data ke server Google Sheets...";
+
+            const sendData = () => {
+                const formData = new URLSearchParams();
+                if (editId) {
+                    formData.append("action", "edit");
+                    formData.append("id", editId);
+                    formData.append("gambarOld", document.getElementById('editProductGambarOld').value);
+                } else {
+                    formData.append("action", "add");
+                    formData.append("id", "PROD-" + Date.now()); 
+                }
+                formData.append("nama", document.getElementById('pName').value);
+                formData.append("harga", document.getElementById('pPrice').value);
+                formData.append("kategori", document.getElementById('pCategory').value);
+                formData.append("status", document.getElementById('pStatus').value);
+                formData.append("deskripsi", document.getElementById('pDesc').value);
+
+                if (fileInput && window.base64String) {
+                    formData.append("fileData", window.base64String);
+                    formData.append("fileType", fileInput.type);
+                    formData.append("fileName", fileInput.name);
+                }
+
+                fetch(GOOGLE_API_URL, { method: "POST", body: formData })
+                .then(res => res.json())
+                .then(response => {
+                    statusBox.className = "status-box status-success";
+                    statusBox.innerText = "✓ " + (response.message || "Data Berhasil Diproses!");
+                    
+                    resetToCreateMode();
+                    loadProductsData(); 
+                    setTimeout(() => statusBox.style.display = "none", 2500);
+                })
+                .catch(err => {
+                    statusBox.className = "status-box";
+                    statusBox.style.backgroundColor = "#fee2e2";
+                    statusBox.style.color = "#b91c1c";
+                    statusBox.innerText = "Gagal memproses data.";
+                });
+            };
+
+            if (fileInput) {
+                const reader = new FileReader();
+                reader.readAsDataURL(fileInput);
+                reader.onload = function() {
+                    window.base64String = reader.result.split(',')[1];
+                    sendData();
+                };
+            } else {
+                window.base64String = "";
+                sendData();
+            }
+        });
+
+        // 4. MENGAKTIFKAN MODE PENGEDITAN DATA (Mengisi otomatis form dengan data lama)
+        function triggerEditMode(index) {
+            const product = localDatabase[index];
+            document.getElementById('formTitle').innerText = "Edit Rincian Produk";
+            document.getElementById('formSubtitle').innerText = `Mengubah rincian data produk: ${product.nama}`;
+            document.getElementById('btnSubmitForm').innerText = "💾 Simpan Perubahan";
+            document.getElementById('btnCancelEdit').style.display = "block";
+            document.getElementById('editInfoGambar').style.display = "block";
+            
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProductGambarOld').value = product.gambar;
+            document.getElementById('pName').value = product.nama;
+            document.getElementById('pPrice').value = product.harga;
+            document.getElementById('pCategory').value = product.kategori ? product.kategori.toLowerCase() : 'makanan';
+            document.getElementById('pStatus').value = product.status ? product.status.toLowerCase() : 'ready';
+            document.getElementById('pDesc').value = product.deskripsi;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 5. RESET FORM KE MODE BUAT BARU
+        function resetToCreateMode() {
+            document.getElementById('formTitle').innerText = "Tambah Produk Baru";
+            document.getElementById('formSubtitle').innerText = "Masukkan data materi komoditas produk ke Google Sheets.";
+            document.getElementById('btnSubmitForm').innerText = "🚀 Publikasikan Produk";
+            document.getElementById('btnCancelEdit').style.display = "none";
+            document.getElementById('editInfoGambar').style.display = "none";
+            document.getElementById('adminForm').reset();
+            document.getElementById('editProductId').value = "";
+            document.getElementById('editProductGambarOld').value = "";
+        }
+
+        // 6. FUNGSI PENGHAPUSAN DATA (Delete)
+        function deleteProductCloud(id, nama) {
+            if(confirm(`Apakah Anda yakin ingin menghapus produk "${nama}" secara permanen dari Google Sheets?`)) {
+                const statusBox = document.getElementById('statusNotification');
+                statusBox.style.display = "block";
+                statusBox.className = "status-box status-loading";
+                statusBox.innerText = "Menghapus data di cloud...";
+
+                const formData = new URLSearchParams();
+                formData.append("action", "delete");
+                formData.append("id", id);
+                
+                fetch(GOOGLE_API_URL, { method: "POST", body: formData })
+                .then(res => res.json())
+                .then(response => {
+                    statusBox.className = "status-box status-success";
+                    statusBox.innerText = "✓ Produk Berhasil Dihapus!";
+                    loadProductsData();
+                    setTimeout(() => statusBox.style.display = "none", 2000);
+                });
+            }
+        }
+
+        // Jalankan sinkronisasi database saat pertama kali masuk halaman
+        loadProductsData();
+    </script>
+</body>
+</html>

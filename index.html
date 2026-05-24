@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda Resmi - Bakaran Gen Z</title>
+    <style>
+        /* --- VARIABLE STYLING UTAMA --- */
+        :root {
+            --primary-red: #b31217; 
+            --secondary-yellow: #fBBF24; 
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+
+        /* --- NAVBAR & DROPDOWN --- */
+        header { background-color: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 999; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 15px 20px; }
+        .logo-text { font-size: 1.6rem; font-weight: 800; color: var(--primary-red); text-decoration: none; letter-spacing: -1px; }
+        
+        .nav-links { display: flex; list-style: none; gap: 25px; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.95rem; transition: color 0.2s; }
+        .nav-links a:hover, .dropdown:hover > a { color: var(--primary-red); }
+
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 0; background-color: var(--card-bg); min-width: 200px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 8px; list-style: none; padding: 10px 0;
+            opacity: 0; pointer-events: none; transform: translateY(-10px); transition: all 0.2s ease; z-index: 1000;
+        }
+        .dropdown-menu li a { padding: 10px 20px; font-weight: 500; font-size: 0.9rem; display: block; }
+        .dropdown-menu li a:hover { background-color: #fff1f2; color: var(--primary-red); }
+        .dropdown:hover .dropdown-menu { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+        /* --- TULISAN BERJALAN --- */
+        .marquee-container {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 12px 0;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--secondary-yellow);
+        }
+        .marquee-text { display: flex; white-space: nowrap; gap: 60px; animation: berjalan 25s linear infinite; }
+        .marquee-container:hover .marquee-text { animation-play-state: paused; }
+        .marquee-item { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px; }
+        @keyframes berjalan { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+
+        /* --- BANNER HERO DENGAN SLIDER 5 FOTO --- */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 2000px;
+            margin: 0 auto;
+            overflow: hidden;
+            background-color: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            width: 500%; /* Mengakomodasi 5 foto berjejer (100% x 5) */
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* PERBAIKAN: RESOLUSI RASIO KUNCI 1920 X 1080 */
+        .slide-img {
+            width: 20%; /* Masing-masing mengambil tepat 1/5 dari lebar wrapper */
+            aspect-ratio: 1920 / 1080; /* Mengunci rasio aspek gambar tetap 16:9 profesional */
+            object-fit: cover; /* Memotong sisi gambar secara seimbang agar tidak kaku/gepeng */
+            object-position: center; /* Fokus potongan gambar tepat berada di tengah */
+            display: block;
+        }
+
+        /* Tombol Navigasi Panah Kiri & Kanan */
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .slider-arrow:hover { background-color: var(--primary-red); }
+        .arrow-left { left: 20px; }
+        .arrow-right { right: 20px; }
+        .slider-arrow:active { transform: translateY(-50%) scale(0.9); }
+
+        /* Indikator Titik (Dots) */
+        .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dot.active {
+            background-color: var(--secondary-yellow);
+            width: 28px;
+            border-radius: 20px;
+        }
+
+        /* --- LAYOUT KONTEN UTAMA --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-title { font-size: 2.2rem; font-weight: 800; color: var(--text-main); letter-spacing: -1px; }
+        .section-subtitle { color: var(--text-muted); font-size: 1.1rem; margin-top: 5px; }
+
+        /* --- GRID PRODUK LIVE --- */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .product-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(179, 18, 23, 0.05); }
+        .product-image-container { width: 100%; height: 240px; overflow: hidden; background: #e2e8f0; position: relative; }
+        .product-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .hot-badge { position: absolute; top: 15px; right: 15px; background-color: var(--primary-red); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        
+        .product-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-category { font-size: 0.8rem; text-transform: uppercase; font-weight: bold; color: var(--text-muted); margin-bottom: 8px; }
+        .product-title { font-size: 1.3rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main); text-decoration: none; line-height: 1.3; }
+        .product-title:hover { color: var(--primary-red); }
+        .product-price { font-size: 1.4rem; color: var(--primary-red); font-weight: 800; margin-top: auto; margin-bottom: 20px; }
+        .btn-detail { display: block; text-align: center; text-decoration: none; background-color: #1e293b; color: white; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
+        .btn-detail:hover { background-color: var(--primary-red); }
+
+        /* --- TOMBOL OJEK ONLINE --- */
+        .delivery-section { background-color: var(--card-bg); border: 1px solid #e2e8f0; border-radius: var(--radius); padding: 40px; margin-top: 60px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.01); }
+        .delivery-title { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+        .delivery-subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; }
+        .delivery-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .btn-delivery { display: flex; align-items: center; gap: 12px; padding: 15px 30px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 1.1rem; color: white; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .btn-delivery:hover { transform: translateY(-3px); }
+        .btn-gofood { background: linear-gradient(135deg, #e52d27 0%, #b31217 100%); }
+        .btn-gofood:hover { box-shadow: 0 6px 20px rgba(229, 45, 39, 0.4); }
+        .btn-grabfood { background: linear-gradient(135deg, #00b14f 0%, #00853b 100%); }
+        .btn-grabfood:hover { box-shadow: 0 6px 20px rgba(0, 177, 79, 0.4); }
+        .delivery-icon { width: 28px; height: 28px; object-fit: contain; }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 0.95rem; margin-top: 80px; border-top: 1px solid #e2e8f0; background-color: var(--card-bg); }
+
+        @media (max-width: 768px) {
+            .section-title { font-size: 1.8rem; }
+            .delivery-buttons { flex-direction: column; gap: 15px; }
+            .btn-delivery { justify-content: center; width: 100%; max-width: 300px; margin: 0 auto; }
+            .slider-arrow { width: 35px; height: 35px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo-text">Bakaran<span style="color: var(--secondary-yellow);">GenZ</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html" style="color: var(--primary-red);">Beranda</a></li>
+                <li class="dropdown">
+                    <a href="produk.html">Produk ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="produk.html?filter=all">Semua Menu</a></li>
+                        <li><a href="produk.html?filter=elektronik">🍹 Minuman Segar</a></li>
+                        <li><a href="produk.html?filter=makanan">💰 Harga Rp 2.000</a></li>
+                        <li><a href="produk.html?filter=pakaian">💰 Harga Rp 4.000</a></li>
+                    </ul>
+                </li>
+                <li><a href="kontak.html">Kontak Kami</a></li>
+                <li><a href="keranjang.html">🛒 Keranjang</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="marquee-container">
+        <div class="marquee-text">
+            <span class="marquee-item">📦 Siap antar langsung lewat platform yang tersedia</span>
+            <span class="marquee-item">🌟 Start From Rp. 2000</span>
+            <span class="marquee-item">🙅🏼‍♀️ Buat yang anti dikecewain Soal Rasa</span>
+            
+            <span class="marquee-item">📦 Siap antar langsung lewat platform yang tersedia</span>
+            <span class="marquee-item">🌟 Start From Rp. 2000</span>
+            <span class="marquee-item">🙅🏼‍♀️ Buat yang anti dikecewain Soal Rasa</span>
+        </div>
+    </div>
+
+    <div class="slider-container">
+        <button class="slider-arrow arrow-left" onclick="geserSlide(-1)">❮</button>
+        <button class="slider-arrow arrow-right" onclick="geserSlide(1)">❯</button>
+
+        <div class="slider-wrapper" id="mainSliderWrapper">
+            <img src="banner.jpeg" alt="Slide 1" class="slide-img">
+            <img src="banner2.jpeg" alt="Slide 2" class="slide-img">
+            <img src="banner3.jpeg" alt="Slide 3" class="slide-img">
+            <img src="banner4.jpeg" alt="Slide 4" class="slide-img">
+            <img src="banner5.jpeg" alt="Slide 5" class="slide-img">
+        </div>
+
+        <div class="slider-dots">
+            <div class="dot active" onclick="lompatKeSlide(0)"></div>
+            <div class="dot" onclick="lompatKeSlide(1)"></div>
+            <div class="dot" onclick="lompatKeSlide(2)"></div>
+            <div class="dot" onclick="lompatKeSlide(3)"></div>
+            <div class="dot" onclick="lompatKeSlide(4)"></div>
+        </div>
+    </div>
+
+    <main class="container">
+        <section class="section-header">
+            <h2 class="section-title">🔥 Menu Terlaris Minggu Ini</h2>
+            <p class="section-subtitle">Pilihan favorit Gen Z yang paling sering dipesan, sinkronisasi live dari cloud.</p>
+        </section>
+        
+        <div class="products-grid" id="bestsellerGrid">
+            <p style="text-align: center; color: var(--text-muted); grid-column: 1/-1; padding: 50px 0; font-size: 1.1rem;">Menghubungkan ke database cloud Google Sheets...</p>
+        </div>
+
+        <section class="delivery-section">
+            <h2 class="delivery-title">🛵 Mager Keluar? Order via Ojol Aja!</h2>
+            <p class="delivery-subtitle">Nikmati kelezatan Bakaran Gen Z langsung diantar hangat ke depan pintu rumah Anda.</p>
+            
+            <div class="delivery-buttons">
+                <a href="https://gofood.link/a/QYUG9Wh" target="_blank" class="btn-delivery btn-gofood">
+                    <img src="https://gofood.co.id/gofood-logo.png" class="delivery-icon" anonymity="no-cors" onerror="this.src='https://placehold.co/28x28?text=GF'" alt="GoFood Logo">
+                    <span>Pesan via GoFood</span>
+                </a>
+                <a href="https://r.grab.com/g/6-20260524_173836_a752021e5ecb423ea94fb48b0ac78dbd_MEXMPS-6-C7LUABJAFGK1LN" target="_blank" class="btn-delivery btn-grabfood">
+                    <img src="https://assets.grab.com/wp-content/uploads/sites/4/2019/04/16142125/grab-logo-white.png" class="delivery-icon" style="width: auto; height: 18px;" onerror="this.src='https://placehold.co/28x28?text=GR'" alt="GrabFood Logo">
+                    <span>Pesan via GrabFood</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Bakaran Gen Z. All rights reserved.</p>
+        <p style="font-size: 0.8rem; margin-top: 5px;">📍 Warung Pak'le Blok F2 No.12 | 📞 NIA: +62 896-4759-7217</p>
+    </footer>
+
+    <script>
+        let indeksSekarang = 0;
+        const totalSlide = 5;
+        let internalTimerSlider;
+
+        function updateTampilanSlider() {
+            const wrapper = document.getElementById('mainSliderWrapper');
+            wrapper.style.transform = `translateX(-${indeksSekarang * 20}%)`;
+
+            const semuaDot = document.querySelectorAll('.dot');
+            semuaDot.forEach((dot, idx) => {
+                if (idx === indeksSekarang) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function geserSlide(arah) {
+            indeksSekarang += arah;
+            if (indeksSekarang >= totalSlide) indeksSekarang = 0;
+            if (indeksSekarang < 0) indeksSekarang = totalSlide - 1;
+            
+            updateTampilanSlider();
+            restartTimerOtomatis();
+        }
+
+        function lompatKeSlide(nomorSlide) {
+            indeksSekarang = nomorSlide;
+            updateTampilanSlider();
+            restartTimerOtomatis();
+        }
+
+        function mulaiTimerOtomatis() {
+            internalTimerSlider = setInterval(() => {
+                geserSlide(1);
+            }, 4000);
+        }
+
+        function restartTimerOtomatis() {
+            clearInterval(internalTimerSlider);
+            mulaiTimerOtomatis();
+        }
+
+        mulaiTimerOtomatis();
+
+        // LOGIKA REST API GOOGLE SHEETS CLOUD
+        const API_URL = "https://script.google.com/macros/s/AKfycbzWywnUXe0r4f2Xb3QHv-jwilcAwdWljSQfTxDhOlUYNRb45Y8OnuOxjokWorzbYaIPvw/exec"; 
+
+        async function fetchBestsellersCloud() {
+            const grid = document.getElementById('bestsellerGrid');
+            try {
+                const antiCacheUrl = `${API_URL}?_=${new Date().getTime()}`;
+                const response = await fetch(antiCacheUrl);
+                const productsList = await response.json();
+                
+                const bestsellerItems = productsList.filter(p => 
+                    p.status && (p.status.toLowerCase() === 'terlaris' || p.status.toLowerCase() === 'terlaris-po')
+                );
+                renderBestsellers(bestsellerItems);
+            } catch (error) {
+                console.error("Gagal sinkronisasi beranda:", error);
+                grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#b31217; padding: 50px 0; font-weight:600;">Gagal terhubung ke database cloud.</p>`;
+            }
+        }
+
+        function renderBestsellers(products) {
+            const grid = document.getElementById('bestsellerGrid');
+            if (products.length === 0) {
+                grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding: 50px 0;">Belum ada produk berstatus "terlaris" di Google Sheets.</p>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => {
+                const statusKata = p.status ? p.status.toLowerCase() : '';
+                const apakahPO = statusKata === 'terlaris-po';
+                const badgeTeks = apakahPO ? '🔥 PRE-ORDER HOT' : '🔥 TERLARIS';
+                const hargaNominal = parseInt(p.harga) || 0;
+
+                let labelKategoriTampil = p.kategori ? p.kategori.toString().trim().toLowerCase() : 'umum';
+                if(labelKategoriTampil === 'makanan') labelKategoriTampil = "Seri Rp 2.000";
+                if(labelKategoriTampil === 'pakaian') labelKategoriTampil = "Seri Rp 4.000";
+
+                return `
+                    <div class="product-card">
+                        <div class="product-image-container">
+                            <img src="${p.gambar || 'https://placehold.co/600x400?text=Tanpa+Foto'}" alt="${p.nama}" onerror="this.src='https://placehold.co/600x400?text=Foto+Tidak+Valid'">
+                            <span class="hot-badge">${badgeTeks}</span>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category"></span>
+                            <a href="detail-produk.html?id=${p.id}" class="product-title">${p.nama || 'Menu Tanpa Nama'}</a>
+                            <div class="product-price">Rp ${hargaNominal.toLocaleString('id-ID')}</div>
+                            <a href="detail-produk.html?id=${p.id}" class="btn-detail">Lihat Detail & Pesan</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        fetchBestsellersCloud();
+    </script>
+</body>
+</html>

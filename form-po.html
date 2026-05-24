@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Pre-Order - Bakaran Gen Z</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6; --secondary-color: #1e3a8a; --background-color: #f8fafc;   
+            --card-background: #ffffff; --text-color: #1e293b; --text-light: #64748b; --border-radius: 12px;         
+        }
+        [data-theme="dark"] {
+            --background-color: #0f172a; --card-background: #1e293b; --text-color: #f8fafc; --text-light: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { background-color: var(--background-color); color: var(--text-color); padding-bottom: 60px; }
+        
+        header { background-color: var(--card-background); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; }
+
+        .container { max-width: 650px; margin: 40px auto; padding: 0 20px; }
+        
+        .po-box {
+            background-color: var(--card-background);
+            padding: 35px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid #eab308; /* Warna kuning khas Pre-Order */
+        }
+
+        .po-box h1 { font-size: 1.8rem; margin-bottom: 10px; color: #a16207; }
+        .po-box p.subtitle { color: var(--text-light); margin-bottom: 25px; font-size: 0.95rem; }
+
+        /* Banner info ringkasan produk yang dipesan */
+        .product-summary-box {
+            background-color: var(--background-color);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #eab308;
+        }
+        .product-summary-box h3 { font-size: 1.1rem; margin-bottom: 4px; }
+        .product-summary-box p { font-weight: bold; color: var(--primary-color); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
+        
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid var(--text-light); border-radius: 8px;
+            background-color: var(--background-color); color: var(--text-color); outline: none; font-size: 1rem;
+        }
+        .form-control:focus { border-color: #eab308; box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2); }
+
+        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .total-pay-box {
+            background-color: var(--background-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+            text-align: right;
+            font-size: 1.2rem;
+        }
+
+        .btn-submit-po {
+            display: block; width: 100%; padding: 14px; background-color: #eab308; color: white;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            margin-top: 20px; text-align: center; text-decoration: none;
+        }
+        .btn-submit-po:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Bakaran Gen Z</a>
+            <span style="font-weight: bold; color: #eab308;">Sistem Pre-Order (PO)</span>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="po-box">
+            <h1>Formulir Kontrak Pre-Order</h1>
+            <p class="subtitle">Silakan lengkapi data kustomisasi dan pengiriman Anda di bawah ini untuk mengamankan kuota pengerjaan produksi.</p>
+            
+            <!-- Ringkasan Paket Barang -->
+            <div class="product-summary-box">
+                <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.5px;">Produk Yang Dipilih:</span>
+                <h3 id="poProductName">Memuat nama produk...</h3>
+                <p id="poProductPrice">Rp 0</p>
+            </div>
+
+            <!-- Formulir Data Pembeli -->
+            <form id="poFormInput">
+                <div class="form-group">
+                    <label for="poCustomerName">Nama Lengkap Pemesan</label>
+                    <input type="text" id="poCustomerName" class="form-control" placeholder="Masukkan nama lengkap Anda" required>
+                </div>
+
+                <div class="flex-group">
+                    <div class="form-group">
+                        <label for="poQty">Jumlah Pesanan (Pcs)</label>
+                        <input type="number" id="poQty" class="form-control" value="1" min="1" required oninput="calculatePOTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="poDuration">Estimasi Pengerjaan</label>
+                        <input type="text" id="poDuration" class="form-control" value="1 - 2 Hari Kerja" readonly style="background:#e2e8f0; color:#64748b;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="poCustomNote">Catatan Kustomisasi (Opsional)</label>
+                    <textarea id="poCustomNote" class="form-control" rows="3" placeholder="Contoh: Minta saos di Gabung/Pisah ya kak"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="poAddress">Alamat Pengiriman Lengkap</label>
+                    <textarea id="poAddress" class="form-control" rows="3" placeholder="Tuliskan nama jalan, kecamatan, kabupaten, dan kode pos" required></textarea>
+                </div>
+
+                <div class="total-pay-box">
+                    Estimasi Total Biaya: <strong id="poTotalLabel" style="color: #eab308;">Rp 0</strong>
+                </div>
+
+                <button type="submit" class="btn-submit-po">Kirim Formulir PO ke WhatsApp ➔</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // --- AMBIL DATA DARI LINK URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const productName = urlParams.get('name') || "Produk Eksklusif";
+        const productPrice = parseInt(urlParams.get('price')) || 0;
+
+        // Pasang data ke UI teks awal
+        document.getElementById('poProductName').innerText = productName;
+        document.getElementById('poProductPrice').innerText = "Rp " + productPrice.toLocaleString('id-ID');
+
+        // --- FUNGSI MENGHITUNG TOTAL HARGA OTOMATIS ---
+        function calculatePOTotal() {
+            const qty = parseInt(document.getElementById('poQty').value) || 1;
+            const total = productPrice * qty;
+            document.getElementById('poTotalLabel').innerText = "Rp " + total.toLocaleString('id-ID');
+        }
+        
+        // Jalankan kalkulasi pertama kali halaman dibuka
+        calculatePOTotal();
+
+        // --- KIRIM DATA DATA FORMULIR KE WHATSAPP ---
+        document.getElementById('poFormInput').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const customerName = document.getElementById('poCustomerName').value;
+            const qty = document.getElementById('poQty').value;
+            const duration = document.getElementById('poDuration').value;
+            const customNote = document.getElementById('poCustomNote').value || "Tidak ada kustomisasi khusus";
+            const address = document.getElementById('poAddress').value;
+            const finalTotal = document.getElementById('poTotalLabel').innerText;
+
+            const targetWA = "6289647597217"; // Ganti dengan nomor WhatsApp Toko Anda
+
+            // Format Nota Pre-Order khusus agar mudah diarsip penjual
+            let textNota = `📝 *NOTA PENGAJUAN PRE-ORDER (PO)*%0A`;
+            textNota += `=================================%0A%0A`;
+            textNota += `• *Nama Produk:* ${productName}%0A`;
+            textNota += `• *Nama Pemesan:* ${customerName}%0A`;
+            textNota += `• *Jumlah (Qty):* ${qty} Pcs%0A`;
+            textNota += `• *Estimasi Produksi:* ${duration}%0A%0A`;
+            textNota += `• *Catatan Kustom:* %0A_${customNote}_%0A%0A`;
+            textNota += `• *Alamat Kirim:* %0A${address}%0A%0A`;
+            textNota += `=================================%0A`;
+            textNota += `💰 *TOTAL ESTIMASI:* *${finalTotal}*%0A%0A`;
+            textNota += `Mohon segera dikonfirmasi slot pengerjaannya dan dikirimkan nomor rekening untuk pembayaran DP/Pelunasan ya min!`;
+
+            window.open(`https://wa.me/${targetWA}?text=${textNota}`, '_blank');
+        });
+    </script>
+</body>
+</html>
