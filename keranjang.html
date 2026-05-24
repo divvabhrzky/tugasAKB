@@ -60,19 +60,15 @@
         .receipt-info-row span:last-child { font-weight: 700; text-align: right; max-width: 280px; word-break: break-word; }
 
         .receipt-table { width: 100%; font-size: 0.85rem; margin-bottom: 15px; border-collapse: collapse; }
-        .receipt-table td { padding: 8px 0; border-bottom: 1px dotted #f1f5f9; vertical-align: center; }
+        .receipt-table td { padding: 8px 0; border-bottom: 1px dotted #f1f5f9; vertical-align: middle; }
         
-        /* Thumbnail Foto Kecil Khusus di Dalam Struk Struk Nota */
         .receipt-prod-thumb { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; margin-right: 10px; vertical-align: middle; display: inline-block; background: #f1f5f9; }
         
         .receipt-total-row { display: flex; justify-content: space-between; border-top: 1px dashed #94a3b8; padding-top: 15px; font-size: 1.1rem; font-weight: 800; }
 
         .btn-whatsapp { width: 100%; padding: 15px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.2s; }
         .btn-whatsapp:hover { transform: translateY(-2px); }
-        .btn-whatsapp:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
     </style>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.41.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -141,9 +137,9 @@
                 </div>
             </div>
 
-            <button class="btn-whatsapp" id="btnKirimWA" onclick="prosesNotaGambarWhatsApp()">
+            <button class="btn-whatsapp" id="btnKirimWA" onclick="kirimNotaKeWhatsApp()">
                 <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2C6.5 2 2 6.5 2 12c0 2.18.7 4.2 1.95 5.87L2.05 22l4.25-1.11c1.62.88 3.44 1.36 5.34 1.36 5.5 0 10-4.5 10-10S17.54 2 12.04 2m5.72 14.1c-.24.67-1.42 1.31-1.95 1.36-.53.05-1.2.05-3.14-.72-2.48-1-4.08-3.53-4.2-3.7-.13-.17-1.03-1.37-1.03-2.62s.65-1.85.88-2.11c.24-.26.5-.33.67-.33s.34 0 .49.03c.15.03.35.03.54.49.2.48.67 1.63.73 1.75.06.12.1.27.03.42-.07.15-.15.25-.24.36-.1.1-.2.24-.3.35-.11.1-.22.23-.1.43.12.2 1.54 2.5 3.32 3.34.45.21.8.34 1.08.43.46.14.88.12 1.21.07.37-.05 1.13-.46 1.29-.91.16-.45.16-.83.11-.91-.05-.08-.18-.12-.38-.23z"/></svg>
-                <span id="textTombol">Kirim & Unduh Gambar Nota Ke WA</span>
+                <span>Kirim Nota Resmi ke WhatsApp</span>
             </button>
         </div>
 
@@ -188,7 +184,6 @@
                 return;
             }
 
-            // A. Menampilkan Foto Produk di Sisi Kiri (Area Edit Keranjang Belanja)
             listContainer.innerHTML = keranjangBelanja.map((item, index) => {
                 const linkFoto = item.gambar || 'https://placehold.co/100?text=No+Photo';
                 return `
@@ -208,7 +203,6 @@
                 `;
             }).join('');
 
-            // B. Menampilkan Foto Miniatur di Sisi Kanan (Area Gambar Struk Struk Nota)
             let totalBiaya = 0;
             notaBody.innerHTML = keranjangBelanja.map(item => {
                 const subTotal = (parseInt(item.price) || 0) * item.quantity;
@@ -243,11 +237,12 @@
             }
         }
 
-        async function prosesNotaGambarWhatsApp() {
+        // =========================================================================
+        // --- LIVE LINK GENERATOR (SINKRONISASI 100% AMAN DI GITHUB PAGES) ---
+        // =========================================================================
+        function kirimNotaKeWhatsApp() {
             const nama = document.getElementById('custName').value.trim();
             const alamat = document.getElementById('custAddress').value.trim();
-            const tombol = document.getElementById('btnKirimWA');
-            const teksTombol = document.getElementById('textTombol');
 
             if (!nama || !alamat) {
                 alert("⚠️ Nama Lengkap dan Alamat Pengiriman wajib diisi!");
@@ -255,54 +250,45 @@
             }
             if (keranjangBelanja.length === 0) return;
 
-            tombol.disabled = true;
-            teksTombol.innerText = "📸 Memotret Struk Nota...";
+            const noNota = document.getElementById('notaID').innerText;
+            const tglNota = document.getElementById('notaTanggal').innerText;
+            const jamNota = document.getElementById('notaJam').innerText;
+            const totalBayar = document.getElementById('notaTotalHarga').innerText;
 
-            try {
-                const strukArea = document.getElementById('notaStrukArea');
-                
-                const canvas = await html2canvas(strukArea, {
-                    scale: 2, 
-                    backgroundColor: "#ffffff",
-                    useCORS: true 
-                });
-                
-                const linkGambarData = canvas.toDataURL("image/png");
-                const namaFileNota = `${document.getElementById('notaID').innerText}.png`;
+            // 1. Susun Teks Nota Utama di WhatsApp Chat (Sangat rapi, jelas, dan profesional)
+            let textWhatsApp = `*🧾 NOTA OPERASIONAL - BAKARAN GENZ*\n`;
+            textWhatsApp += `===================================\n`;
+            textWhatsApp += `🆔 *No. Order :* ${noNota}\n`;
+            textWhatsApp += `📅 *Tanggal   :* ${tglNota}\n`;
+            textWhatsApp += `🕒 *Waktu     :* ${jamNota}\n`;
+            textWhatsApp += `===================================\n\n`;
+            textWhatsApp += `*👤 DATA PELANGGAN:*\n`;
+            textWhatsApp += `• *Nama   :* ${nama}\n`;
+            textWhatsApp += `• *Alamat :* ${alamat}\n`;
+            textWhatsApp += `===================================\n\n`;
+            textWhatsApp += `*📦 DAFTAR BELANJA PESANAN:*\n`;
 
-                teksTombol.innerText = "📥 Menyimpan Foto Ke Galeri...";
+            keranjangBelanja.forEach((item, index) => {
+                const subTotal = (parseInt(item.price) || 0) * item.quantity;
+                textWhatsApp += `${index + 1}. *${item.name}* (x${item.quantity}) -> Rp ${subTotal.toLocaleString('id-ID')}\n`;
+            });
 
-                const linkDownloadTerselubung = document.createElement("a");
-                linkDownloadTerselubung.href = linkGambarData;
-                linkDownloadTerselubung.download = namaFileNota;
-                document.body.appendChild(linkDownloadTerselubung);
-                linkDownloadTerselubung.click();
-                document.body.removeChild(linkDownloadTerselubung);
+            textWhatsApp += `\n===================================\n`;
+            textWhatsApp += `*💰 TOTAL AKHIR BAYAR : ${totalBayar}*\n`;
+            textWhatsApp += `===================================\n\n`;
+            textWhatsApp += `_Mohon segera diproses ya Min, Terimakasih!_ 🙏✨`;
 
-                teksTombol.innerText = "📲 Membuka WhatsApp...";
+            const urlFormat = encodeURIComponent(textWhatsApp);
+            const linkWhatsAppAPI = `https://api.whatsapp.com/send?phone=${NOMOR_WHATSAPP_ADMIN}&text=${urlFormat}`;
 
-                let templateTextWA = `*Halo Admin Bakaran GenZ!* 👋\n\n`;
-                templateTextWA += `Saya telah melakukan pemesanan produk lewat website. Berikut ini adalah rangkuman singkat datanya:\n\n`;
-                templateTextWA += `👤 *Nama Penerima:* ${nama}\n`;
-                templateTextWA += `🆔 *Nomor Orderan:* ${document.getElementById('notaID').innerText}\n`;
-                templateTextWA += `💰 *Total Pembayaran:* ${document.getElementById('notaTotalHarga').innerText}\n\n`;
-                templateTextWA += `📂 _(FOTO NOTA STRUK BESERTA FOTO PRODUK SUDAH OTOMATIS TER-DOWNLOAD DI GALERI HP SAYA, SEBENTAR LAGI SAYA LAMPIRKAN DI BAWAH INI SEBAGAI BUKTI)_`;
+            // Bersihkan data keranjang belanja lokal karena transaksi telah dikirim
+            localStorage.removeItem('tokoku_cart');
 
-                const urlFormat = encodeURIComponent(templateTextWA);
-                const linkWhatsAppAPI = `https://api.whatsapp.com/send?phone=${NOMOR_WHATSAPP_ADMIN}&text=${urlFormat}`;
-
-                localStorage.removeItem('tokoku_cart');
-                window.open(linkWhatsAppAPI, '_blank');
-                
-                teksTombol.innerText = "Berhasil! Halaman Dimuat Ulang...";
-                setTimeout(() => window.location.reload(), 1500);
-
-            } catch (error) {
-                console.error(error);
-                alert("Sistem lokal browser Anda menolak pemicu download otomatis. Silakan screenshot manual area nota!");
-                tombol.disabled = false;
-                teksTombol.innerText = "Kirim & Unduh Gambar Nota Ke WA";
-            }
+            // Buka WhatsApp
+            window.open(linkWhatsAppAPI, '_blank');
+            
+            // Segarkan halaman
+            setTimeout(() => window.location.reload(), 1000);
         }
 
         window.onload = inisialisasiHalaman;
