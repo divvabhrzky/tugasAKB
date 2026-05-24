@@ -115,12 +115,12 @@
             <ul class="nav-links">
                 <li><a href="index.html">Beranda</a></li>
                 <li class="dropdown">
-                    <a href="produk.html" style="color: var(--primary-red);">Katalog Produk ▾</a>
+          <a href="produk.html">Produk ▾</a>
                     <ul class="dropdown-menu">
-                        <li><a href="#" onclick="aplikasikanFilter('all')">Semua Menu</a></li>
-                        <li><a href="#" onclick="aplikasikanFilter('makanan')">🍔 Makanan</a></li>
-                        <li><a href="#" onclick="aplikasikanFilter('pakaian')">👕 Pakaian</a></li>
-                        <li><a href="#" onclick="aplikasikanFilter('elektronik')">⚡ Elektronik</a></li>
+                        <li><a href="produk.html?filter=all">Semua Menu</a></li>
+                        <li><a href="produk.html?filter=elektronik">🍹 Minuman Segar</a></li>
+                        <li><a href="produk.html?filter=makanan">💰 Harga Rp 2.000</a></li>
+                        <li><a href="produk.html?filter=pakaian">💰 Harga Rp 4.000</a></li>
                     </ul>
                 </li>
                 <li><a href="kontak.html">Kontak kami</a></li>
@@ -250,7 +250,7 @@
                             ${komponenBadge}
                         </div>
                         <div class="product-info">
-                            <span class="product-category">${labelKategori}</span>
+                            <span class="product-category"></span>
                             <a href="detail-produk.html?id=${produk.id}" class="product-title">${produk.nama || 'Menu Tanpa Nama'}</a>
                             <p class="product-description">${produk.deskripsi || 'Nikmati sensasi kelezatan produk berkualitas premium buatan Bakaran Gen Z.'}</p>
                             <div class="product-price">Rp ${nominalHarga.toLocaleString('id-ID')}</div>
